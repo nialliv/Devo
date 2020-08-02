@@ -1,0 +1,16 @@
+---
+- name: Servers
+  hosts: servers
+  become: yes
+  tasks:
+  - name: Copy MyFile
+    copy:
+      src: "~/myfile"
+      dest: "~/myfile1"
+  - name: LS file
+    shell:
+      cmd: "ls -ltr /root/ | grep myfile"
+    register: res
+
+  - debug:
+      var: res.stdout_lines
