@@ -1,0 +1,49 @@
+---
+- name: "Task #1"
+  hosts: servers
+  become: yes
+  vars: 
+    user: ansible
+    pac:
+      # - '*'
+      - 'epel-release'
+      - 'https://rpms.remirepo.net/enterprise/remi-release-8.rpm'
+    # seds:
+    #   - "sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config"
+    #   - "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config"
+  tasks:
+  - name: "yum update and  install epel, nodejs, npm "
+    yum:
+      name: "{{ pac }}"
+      state: present
+  - rpm_key:
+      key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
+      state: present
+  # exclude: kernel*,mysql*
+  # - name: "yum install epel "
+  #   yum:
+  #     name: 'epel-release'
+  #     state: present
+  - name: "Create user {{ user }}"
+    user:
+      name: "{{ user }}"
+      # password: "$6$ansible$KAJ/MBQw3q.OCmVVCZ7B3aAozUZYM6INJWnU6p95g95K9ROqDCJ8nEFXw5Wrn4WHXYvHfi/VUkJdZZ0HpKzhq0"
+      shell: /bin/bash
+      groups: 
+        - 'users'
+        - 'wheel'
+      append: yes
+  - name: "Take ssh_key for {{ user }}"
+    authorized_key:
+      user: "{{ user }}"
+      state: present
+      key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}"
+      # 
+  - name: "Change sshd_config"
+    shell:
+      cmd: "sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config"
+  - shell:
+      cmd: "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config"
+  - systemd:
+      name: "sshd"
+      state: "restarted"

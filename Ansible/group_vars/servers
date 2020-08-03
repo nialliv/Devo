@@ -1,0 +1,5 @@
+---
+ansible_ssh_user:  ansible
+host_key_checking: False
+ansible_sudo_pass: ansible
+ansible_ssh_private_key: /home/vagrant/.ssh/id_rsa
