@@ -1,0 +1,66 @@
+---
+# tasks file for PRODUCTION
+- name: "yum update"
+  yum:
+    name: '*'
+    state: latest
+
+- name: "yum install epel, nodejs, npm "
+  yum:
+    name: "{{ pac }}"
+    state: present
+
+- name: "Import GPG key"
+  rpm_key:
+    key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
+    state: present
+
+- name: "Create user {{ user }}"
+  user:
+    name: "{{ user }}"
+    # password: "$6$ansible$KAJ/MBQw3q.OCmVVCZ7B3aAozUZYM6INJWnU6p95g95K9ROqDCJ8nEFXw5Wrn4WHXYvHfi/VUkJdZZ0HpKzhq0"
+    shell: /bin/bash
+    groups: 
+      - 'users'
+      - 'wheel'
+    append: yes
+
+- name: "Take ssh_key for {{ user }}"
+  authorized_key:
+    user: "{{ user }}"
+    state: present
+    key: "{{ lookup('file', '/home/{{ home }}/.ssh/id_rsa.pub') }}"
+
+- name: "Change sshd_config"
+  shell:
+    cmd: "sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config"
+- shell:
+    cmd: "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config"
+- systemd:
+    name: "sshd"
+    state: "restarted"
+    
+- name: "Install app.js"
+  copy:
+    src: "app.js"
+    dest: "/home/ansible/"
+    owner: "ansible"
+    mode: "0644"
+
+- name: "Install packagees.json"
+  copy:
+    src: "package.json"
+    dest: "/home/ansible/app.jspackage.json"
+    owner: "ansible"
+    mode: "0644"
+
+- name: "NPM install package express"
+  npm:
+    name: "express"
+    state: "present"
+    global: "yes"
+
+
+- name: "Start app.js"
+  shell:
+    cmd: "nohup node app.js &"

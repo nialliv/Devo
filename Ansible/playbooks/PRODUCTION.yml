@@ -1,0 +1,8 @@
+
+---
+- name:   Neoflex
+  hosts:  clients
+  become: yes
+
+  roles:
+    - { role: PRODUCTION }

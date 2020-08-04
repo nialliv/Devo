@@ -1,0 +1,12 @@
+---
+# vars file for PRODUCTION
+
+# List for install on servers
+pac:
+  - 'epel-release'
+  - 'https://rpms.remirepo.net/enterprise/remi-release-7.rpm'
+  - 'nodejs'
+  - 'wget'
+
+# variable $HOME directory
+home: ansible
