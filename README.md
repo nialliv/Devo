@@ -1,10 +1,10 @@
 DevoPsi
 
-# ===== Update Ansible/inventory/hosts.yml
-# ===== Update Ansible/playbooks/PRODUCTION/handlers
-# ===== Update Ansible/playbooks/PRODUCTION/tasks
-# ===== Update Ansible/playbooks/PRODUCTION/vars
-# ===== Update Ansible/playbooks/PRODUCTION/defaults
+Update Ansible/inventory/hosts.yml
+Update Ansible/playbooks/PRODUCTION/handlers
+Update Ansible/playbooks/PRODUCTION/tasks
+Update Ansible/playbooks/PRODUCTION/vars
+Update Ansible/playbooks/PRODUCTION/defaults
 
 # Для переключения окружения используем 2 переменных:
 
