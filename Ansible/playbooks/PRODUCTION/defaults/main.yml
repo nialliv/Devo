@@ -1,8 +1,8 @@
 ---
 # defaults file for PRODUCTION
-hosts: clients
 become: yes
 user: ansible
+ansible_user: ansible
 ansible_ssh_user:  ansible
 host_key_checking: False
 ansible_sudo_pass: ansible

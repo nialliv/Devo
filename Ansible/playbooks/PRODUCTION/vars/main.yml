@@ -1,12 +1,28 @@
 ---
 # vars file for PRODUCTION
 
+# variable $HOME directory
+home: ansible
+
+# ========== Variables for hosts ==========
+# ===== clients ===========================
+client1: 192.168.1.75 # ===================
+client2: 192.168.1.76 # ===================
+client3: 192.168.1.77 # ===================
+# ===== servers ===========================
+serv1: 192.168.1.11   # ===================
+serv2: 192.168.1.12   # ===================
+serv3: 192.168.1.13   # ===================
+serv4: 192.168.1.14   # ===================
+serv5: 192.168.1.15   # ===================
+# ===== admins ============================
+adm_jicool: 192.168.1.70 # ================
+adm_nik:    192.168.1.45 # ================
+# ========== Variables for hosts ==========
+
 # List for install on servers
 pac:
   - 'epel-release'
-  - 'https://rpms.remirepo.net/enterprise/remi-release-7.rpm'
   - 'nodejs'
   - 'wget'
 
-# variable $HOME directory
-home: ansible

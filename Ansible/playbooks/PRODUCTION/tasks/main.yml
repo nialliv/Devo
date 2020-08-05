@@ -10,6 +10,20 @@
     name: "{{ pac }}"
     state: present
 
+- name: "yum install Remi - 7"
+  yum:
+    name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+    state: present
+  when: ansible_distribution_major_version == "7"
+  notify: "CentOS --version"
+
+- name: "yum install Remi - 8"
+  yum:
+    name: "https://rpms.remirepo.net/enterprise/remi-release-8.rpm"
+    state: present
+  when: ansible_distribution_major_version == "8"
+  notify: "CentOS --version"
+
 - name: "Import GPG key"
   rpm_key:
     key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi"
@@ -31,23 +45,32 @@
     state: present
     key: "{{ lookup('file', '/home/{{ home }}/.ssh/id_rsa.pub') }}"
 
-- name: "Change sshd_config"
-  shell:
-    cmd: "sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config"
-- shell:
-    cmd: "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config"
-- systemd:
-    name: "sshd"
-    state: "restarted"
+- name: "Change sshd_config(PermitRootLogin)"
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PermitRootLogin yes"
+    line: "PermitRootLogin No"
+  notify: "Restart sshd"
+  # shell:
+  #   cmd: "sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config"
+  
+- name: "Change sshd_config(PasswordAuthentication)"
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PasswordAuthentication yes"
+    line: "PasswordAuthentication no"
+  notify: "Restart sshd"
+  # shell:
+  #   cmd: "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config"
     
-- name: "Install app.js"
+- name: "Deploying ===> app.js"
   copy:
     src: "app.js"
     dest: "/home/ansible/"
     owner: "ansible"
     mode: "0644"
 
-- name: "Install packagees.json"
+- name: "Deploying ===> packagees.json"
   copy:
     src: "package.json"
     dest: "/home/ansible/app.jspackage.json"
