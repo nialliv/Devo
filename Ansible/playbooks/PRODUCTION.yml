@@ -1,7 +1,7 @@
 
 ---
 - name:   Neoflex
-  hosts: clients
+  hosts: "{{ MYHOSTS }}"
   become: yes
 
   roles:

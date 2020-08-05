@@ -1,4 +1,11 @@
 Role Name
+  - name : PRODUCTION
+    roles:
+      - { role: PRODUCTION }
+  - pwd: 
+      - '~/DevoPsi/Ansible'
+  - example:
+      - ansible-playbook playbooks/PRODUCTION.yml [ --extra-vars | --extra-var | -e ]"MYHOSTS=[ servers | clients ], HOME=[ vagrant | ansible ]"
 =========
 
 A brief description of the role goes here.

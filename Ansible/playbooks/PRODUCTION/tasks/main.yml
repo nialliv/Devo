@@ -10,6 +10,12 @@
     name: "{{ pac }}"
     state: present
 
+- name: Install Node.js and npm.
+  yum: 
+    name: npm
+    state: present
+    enablerepo: epel
+
 - name: "yum install Remi - 7"
   yum:
     name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
@@ -70,20 +76,58 @@
     owner: "ansible"
     mode: "0644"
 
-- name: "Deploying ===> packagees.json"
+- name: "Deploying ===> packages.json"
   copy:
     src: "package.json"
-    dest: "/home/ansible/app.jspackage.json"
+    dest: "/home/ansible/package.json"
     owner: "ansible"
     mode: "0644"
 
+- name: "Install app dependencies defined in package.json"
+  npm: 
+    path: "/home/ansible/"
+
+- name: "Install Forever (to run our Node.js app)"
+  npm: 
+    name: forever
+    global: yes
+    state: latest
+
 - name: "NPM install package express"
   npm:
-    name: "express"
-    state: "present"
-    global: "yes"
+    name:  express
+    state: latest
+    global: yes
+    path: "/home/ansible/"
 
+- name: "Ensure firewalld is stopped (since this is a test server)"
+  service: 
+    name: firewalld  
+    state: stopped
 
-- name: "Start app.js"
-  shell:
-    cmd: "nohup node app.js &"
+# - name: Check list of running Node.js apps.
+#   command: "forever list"
+#   register: forever_list
+#   changed_when: false
+
+- name: "Start example Node.js app in 8080 port"
+  command: "forever start app.js"
+  # when: "forever_list.stdout.find('/home/{{ home }}/app.js') == -1"
+
+- name: "Waiting for status of app.js for 30 second"
+  wait_for:
+    timeout: 30
+
+- name: "Wget localhost:80"
+  get_url:
+    url:  "http://localhost:80"
+    dest: "/home/{{ home }}/"
+    mode: '0755'
+  register: result
+
+- name: "get_url status"
+  debug:
+    var: "{{ item }}"
+  loop:
+    - result.status_code
+    - result.url

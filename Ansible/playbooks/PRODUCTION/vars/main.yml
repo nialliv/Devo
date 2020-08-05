@@ -2,7 +2,7 @@
 # vars file for PRODUCTION
 
 # variable $HOME directory
-home: ansible
+home: "{{ HOME }}"
 
 # ========== Variables for hosts ==========
 # ===== clients ===========================

@@ -1,3 +1,4 @@
+# здесь переменные для примера с модуля setup
 s | SUCCESS => {
     "ansible_facts": {
         "ansible_all_ipv4_addresses": [
