@@ -6,8 +6,8 @@ echo "===================================="
 echo "=========== Strat update ==========="
 echo "===================================="
 
-yum -y update 
-yum -y install vim bash-completion
+#yum -y update 
+#yum -y install vim bash-completion
 
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 systemctl restart sshd.service
