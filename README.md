@@ -1,22 +1,10 @@
 DevoPsi
 
-+ надо пролить ssh-keygen на админку
-+ надо пролить ss-copy-id на серваки
-+ пролить гита на админку
+Ansible branch
 
-pwd = ~/DevoPsi/Ansible
+После поднятия тачек запускаем плейбук preset.yml 
+Там генерится id_rsa ключ на админке
+И создается пользователь ansible на всех тачках
 
-Для запуска надо:
-ansible-playbook playbooks/PRODUCTION.yml -e "MYHOSTS=<myHostsVariable>, HOME=<homedir_admin_server>"
-
-
-Для переключения окружения используем 2(сократил до 0) переменных:
-
-== группы в файле Ansible/inventory/hosts.yml ==
-== переменные лежат в Ansible/playbooks/PRODUCTION/vars/main.yml ==
-
-Update Ansible/inventory/hosts.yml
-Update Ansible/playbooks/PRODUCTION/handlers
-Update Ansible/playbooks/PRODUCTION/tasks
-Update Ansible/playbooks/PRODUCTION/vars
-Update Ansible/playbooks/PRODUCTION/defaults
+После этого плейбука запускаем плейбук setup.yml
+Которы обновляет все пакеты на тчках и ставит репозиторий epel-release со всякими пакетиками для удобства
