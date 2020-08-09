@@ -1,0 +1,7 @@
+---
+
+- name: Start setups
+  hosts: all
+  become: yes
+  roles:
+    - setups

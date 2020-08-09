@@ -3,15 +3,16 @@
 
 # ========== Variables for hosts ==========
 # ===== servers ===========================
-serv1: 192.168.1.11   # ===================
-serv2: 192.168.1.12   # ===================
-serv3: 192.168.1.13   # ===================
-serv4: 192.168.1.14   # ===================
-serv5: 192.168.1.15   # ===================
+# serv1: 192.168.1.11   # ===================
+# serv2: 192.168.1.12   # ===================
+# serv3: 192.168.1.13   # ===================
+# serv4: 192.168.1.14   # ===================
+# serv5: 192.168.1.15   # ===================
 # ========== Variables for hosts ==========
-ansible_ssh_user: vagrant
-ansible_ssh_pass: vagrant
-ansible_become_pass: vagrant
+# ansible_ssh_user: vagrant
+# ansible_ssh_pass: vagrant
+# ansible_become_pass: vagrant
+user_pass_set: vagrant
 # whose user we are creating
 user: ansible
 
