@@ -1,4 +1,33 @@
 ---
 # tasks file for roles/preset
 
-- ping:
+- name: Creating user {{ user }}
+  user:
+    name: "{{ user }}"
+    password: "$6$ansible$KAJ/MBQw3q.OCmVVCZ7B3aAozUZYM6INJWnU6p95g95K9ROqDCJ8nEFXw5Wrn4WHXYvHfi/VUkJdZZ0HpKzhq0"
+    shell: /bin/bash
+    groups:
+      - "users"
+      - "wheel"
+    append: yes
+
+- name: "Take ssh_key for {{ user }}"
+  authorized_key:
+    user: "{{ user }}"
+    state: present
+    key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}"
+
+- name: "Change sshd_config(PermitRootLogin)"
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PermitRootLogin yes"
+    line: "PermitRootLogin No"
+  notify: "Restart sshd"
+
+- name: "Change sshd_config(PasswordAuthentication)"
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PasswordAuthentication yes"
+    line: "PasswordAuthentication no"
+  notify: "Restart sshd"
+ 

@@ -1,9 +1,9 @@
 ---
-- name: Check ping to admin
+- name: Generate key
   hosts: admins
   become: yes
   roles: 
-    - role: preset
+    - role: generate_idrsa
 
 - name: Check ping to servers
   hosts: servers

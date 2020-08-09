@@ -8,12 +8,10 @@ serv2: 192.168.1.12   # ===================
 serv3: 192.168.1.13   # ===================
 serv4: 192.168.1.14   # ===================
 serv5: 192.168.1.15   # ===================
-# ===== admins ============================
-adm: 192.168.1.45 # ================
 # ========== Variables for hosts ==========
 ansible_ssh_user: vagrant
 ansible_ssh_pass: vagrant
 ansible_become_pass: vagrant
 # whose user we are creating
-user: asible
+user: ansible
 
