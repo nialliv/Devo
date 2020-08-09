@@ -1,7 +1,7 @@
 ---
 # tasks file for roles/preset
 
-- name: Creating user {{ user }}
+- name: Creating user "{{ user }}"
   user:
     name: "{{ user }}"
     password: "$6$ansible$KAJ/MBQw3q.OCmVVCZ7B3aAozUZYM6INJWnU6p95g95K9ROqDCJ8nEFXw5Wrn4WHXYvHfi/VUkJdZZ0HpKzhq0"
