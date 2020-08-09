@@ -1,9 +1,0 @@
----
-- name: Servers
-  hosts: servers
-  become: yes
-  tasks:
-  - name: Yum update
-    yum:
-      name: '*'
-      state: latest

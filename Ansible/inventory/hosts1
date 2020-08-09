@@ -1,9 +1,0 @@
-# ansible clients
----
-all:
-  hosts:
-    clients:    
-      ansible_user: 192.168.1.76
-      # client2 ansible_host=192.168.1.76
-      # client3 ansible_host=192.168.1.77
-...
