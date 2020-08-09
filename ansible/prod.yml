@@ -1,0 +1,12 @@
+---
+- name: Check ping to admin
+  hosts: admins
+  become: yes
+  roles: 
+    - role: preset
+
+- name: Check ping to servers
+  hosts: servers
+  become: yes
+  roles:
+    - role: preset
