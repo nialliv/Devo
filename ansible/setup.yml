@@ -1,6 +1,7 @@
 ---
 
 - name: Start setups
+  gather_facts: no
   hosts: all
   become: yes
   roles:
