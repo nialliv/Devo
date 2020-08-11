@@ -42,17 +42,33 @@
       - 'alertmanager.service' 
       - 'node_exporter.service' 
 
-  - name: Create directory for prometheus
+
+
+# CREATE DIRECTORIES FOR ALL PACKAGES
+  - name: Create directories
     file:
-      path: "{{ item }}"
+      path: "{{ item.path }}"
       state: directory
-      owner: vagrant
-      group: vagrant
+      owner: "{{ item.owner }}"
+      group: "{{ item.group }}"
       mode: 0777
     loop:
-      - /etc/prometheus
-      - /var/lib/prometheus
-      - /home/vagrant/prometheus
+      - { 
+          owner: 'vagrant', 
+          group: 'vagrant',
+          path: [ 
+                  '/etc/prometheus', '/var/lib/prometheus', '/home/vagrant/prometheus', '/home/vagrant/node_exporter',
+                  '/home/vagrant/alertmanager', '/var/lib/alertmanager', '/etc/alertmanager', '/home/vagrant/grafana' 
+                ]   
+        }
+      # - /etc/prometheus
+      # - /var/lib/prometheus
+      # - /home/vagrant/prometheus
+      # - /home/vagrant/node_exporter
+      # - /home/vagrant/alertmanager
+      # - /var/lib/alertmanager
+      # - /etc/alertmanager
+      # - /home/vagrant/grafana
 
   - name: Download files for prometheus
     get_url:
@@ -86,13 +102,13 @@
       - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/prometheus.yml', dest: '/etc/prometheus' }
     
 # ========================== NODE_EXPORTER =====================
-  - name: Create directory for node_exporter
-    file:
-      path: /home/vagrant/node_exporter
-      state: directory
-      owner: vagrant
-      group: vagrant
-      mode: 0775
+  # - name: Create directory for node_exporter
+  #   file:
+  #     path: /home/vagrant/node_exporter
+  #     state: directory
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
 
   - name: Download files for node_exporter
     get_url:
@@ -124,17 +140,17 @@
 
 # ========================== ALERT_MANAGER =====================
 
-  - name: Create directory for alertmanager
-    file:
-      path: "{{ item }}"
-      state: directory
-      owner: vagrant
-      group: vagrant
-      mode: 0775
-    loop:
-      - /home/vagrant/alertmanager
-      - /var/lib/alertmanager
-      - /etc/alertmanager
+  # - name: Create directory for alertmanager
+  #   file:
+  #     path: "{{ item }}"
+  #     state: directory
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+  #   loop:
+  #     - /home/vagrant/alertmanager
+  #     - /var/lib/alertmanager
+  #     - /etc/alertmanager
 
   - name: Download files for alertmanager
     get_url:
@@ -167,15 +183,15 @@
 
 # ========================== GRAFANA =====================
 
-  - name: Create directory for grafana
-    file:
-      path: "{{ item }}"
-      state: directory
-      owner: vagrant
-      group: vagrant
-      mode: 0775
-    loop:
-      - /home/vagrant/grafana
+  # - name: Create directory for grafana
+  #   file:
+  #     path: "{{ item }}"
+  #     state: directory
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+  #   loop:
+  #     - /home/vagrant/grafana
 
   - name: Download files for grafana
     get_url:
@@ -194,31 +210,71 @@
   - name: logs for install grafana
     debug:
       var: grafana
+
+
+
+  # - name: TEST !!!! Configurate config.yml for prometheus
+  #   lineinfile:
+  #     path:   "{{ item.path }}"
+  #     regexp: "{{ item.regexp }}"
+  #     line:   "{{ item.line }}"
+  #   loop:
+  #     - { path: '/etc/prometheus/prometheus.yml', 
+  #         regexp: ['-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]', '- job_name: \Wprometheus\W', '# - alertmanager:9093' ], 
+  #         line: [ "      - targets: ['localhost:9100', '192.168.1.64:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']", '- job_name: \Wprometheus\W', "        - alertmanager:9093" ]}
+  #   notify: Restart services and daemon-reload
       
+      
+      # - { path: '/etc/prometheus/prometheus.yml', regexp: '- job_name: \Wprometheus\W', line: "  - job_name: 'node'" }
+      # - { path: '/etc/prometheus/prometheus.yml', regexp: '# - alertmanager:9093', line: "        - alertmanager:9093" }
+
   - name: Configurate config.yml for prometheus
     lineinfile:
-      path: /etc/prometheus/prometheus.yml
-      regexp: '-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]'
-      line: "      - targets: ['localhost:9100', '192.168.1.64:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+      path:   "{{ item.path }}"
+      regexp: "{{ item.regexp }}"
+      line:   "{{ item.line }}"
+    loop:
+      - {
+          path: '/etc/prometheus/prometheus.yml', 
+          regexp: '-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]', 
+          line: "      - targets: ['localhost:9100', '192.168.1.64:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+        }
+      - {
+          path: '/etc/prometheus/prometheus.yml', 
+          regexp: '- job_name: \Wprometheus\W', 
+          line: "  - job_name: 'node'" 
+        }
+      - { 
+          path: '/etc/prometheus/prometheus.yml', 
+          regexp: '# - alertmanager:9093', 
+          line: "        - alertmanager:9093" 
+        }
     notify: Restart services and daemon-reload
 
-  - name: Configurate config.yml for prometheus1
-    lineinfile:
-      path: /etc/prometheus/prometheus.yml
-      regexp: '- job_name: \Wprometheus\W'
-      line: "  - job_name: 'node'"
-    notify: Restart services and daemon-reload
+  # - name: Configurate config.yml for prometheus
+  #   lineinfile:
+  #     path: /etc/prometheus/prometheus.yml
+  #     regexp: '-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]'
+  #     line: "      - targets: ['localhost:9100', '192.168.1.64:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+  #   notify: Restart services and daemon-reload
 
-  - name: Configurate config.yml for prometheus2
-    lineinfile:
-      path: /etc/prometheus/prometheus.yml
-      regexp: '# - alertmanager:9093'
-      line: "        - alertmanager:9093"
-    notify: Restart services and daemon-reload
+  # - name: Configurate config.yml for prometheus1
+  #   lineinfile:
+  #     path: /etc/prometheus/prometheus.yml
+  #     regexp: '- job_name: \Wprometheus\W'
+  #     line: "  - job_name: 'node'"
+  #   notify: Restart services and daemon-reload
 
-  - name: daemon-reload
-    systemd:
-      daemon_reload: yes
+  # - name: Configurate config.yml for prometheus2
+  #   lineinfile:
+  #     path: /etc/prometheus/prometheus.yml
+  #     regexp: '# - alertmanager:9093'
+  #     line: "        - alertmanager:9093"
+  #   notify: Restart services and daemon-reload
+
+  # - name: daemon-reload
+  #   systemd:
+  #     daemon_reload: yes
 
   - name: start services
     systemd:
