@@ -198,19 +198,22 @@
     lineinfile:
       path: /etc/prometheus/prometheus.yml
       regexp: '-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]'
-      line: "      - targets: ['localhost:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+      line: "      - targets: ['localhost:9100', '192.168.1.64:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+    notify: Restart services and daemon-reload
 
   - name: Configurate config.yml for prometheus1
     lineinfile:
       path: /etc/prometheus/prometheus.yml
       regexp: '- job_name: \Wprometheus\W'
       line: "  - job_name: 'node'"
+    notify: Restart services and daemon-reload
 
   - name: Configurate config.yml for prometheus2
     lineinfile:
       path: /etc/prometheus/prometheus.yml
       regexp: '# - alertmanager:9093'
       line: "        - alertmanager:9093"
+    notify: Restart services and daemon-reload
 
   - name: daemon-reload
     systemd:

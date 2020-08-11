@@ -1,2 +1,13 @@
 ---
 # handlers file for prometheus
+
+- name: Restart services and daemon-reload
+  systemd:
+    daemon_reload: yes
+    name:  "{{ item.name }}"
+    state: "{{ item.state }}"
+  loop:
+    - { name: prometheus.service,     state: restarted }
+    - { name: prometheus.service,     state: restarted }
+    - { name: alertmanager.service,   state: restarted }
+    - { name: grafana-server.service, state: restarted }
