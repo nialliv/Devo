@@ -362,8 +362,8 @@
     copy:
       src: 'node_exporter.service'  
       dest: '/etc/systemd/system/'
-      owner: prometheus
-      group: prometheus
+      owner: vagrant
+      group: vagrant
       mode: 0777
 
   - name: daemon-reload
