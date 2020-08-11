@@ -79,6 +79,7 @@
       owner: vagrant
       group: vagrant
       mode: 0775
+      force: no
     loop:
       - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/prometheus', dest: '/usr/local/bin/' }
       - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/promtool', dest: '/usr/local/bin/' }
@@ -157,7 +158,7 @@
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
       remote_src: yes
-      owner: vagrant
+      owner: vagrantcurl: (7) Failed to connect to 192.168.1.64 port 9100: No route to host
       group: vagrant
       mode: 0775
     loop:
@@ -173,7 +174,7 @@
       owner: vagrant
       group: vagrant
       mode: 0775
-    loop:
+    loop:curl: (7) Failed to connect to 192.168.1.64 port 9100: No route to host
       - /home/vagrant/grafana
 
   - name: Download files for grafana
@@ -193,7 +194,7 @@
   - name: logs for install grafana
     debug:
       var: grafana
-
+curl: (7) Failed to connect to 192.168.1.64 port 9100: No route to host
   - name: Configurate config.yml for prometheus
     lineinfile:
       path: /etc/prometheus/prometheus.yml
