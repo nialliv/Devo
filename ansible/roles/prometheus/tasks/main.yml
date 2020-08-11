@@ -174,7 +174,7 @@
       owner: vagrant
       group: vagrant
       mode: 0775
-    loop:curl: (7) Failed to connect to 192.168.1.64 port 9100: No route to host
+    loop:
       - /home/vagrant/grafana
 
   - name: Download files for grafana
@@ -194,7 +194,7 @@
   - name: logs for install grafana
     debug:
       var: grafana
-curl: (7) Failed to connect to 192.168.1.64 port 9100: No route to host
+      
   - name: Configurate config.yml for prometheus
     lineinfile:
       path: /etc/prometheus/prometheus.yml
