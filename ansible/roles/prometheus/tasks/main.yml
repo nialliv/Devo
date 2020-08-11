@@ -372,7 +372,7 @@
       home: /
       append: yes
     loop:
-      - { name: node_exporter, group: [ 'node_exporter', 'users' ] }
+      - { name: node_exporter, group: "node_exporter, users" }
 
   - name: Create directory for node_exporter
     file:
@@ -429,4 +429,3 @@
       enabled: yes
 
   when: ansible_hostname != 'admin'
-  
