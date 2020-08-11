@@ -24,9 +24,9 @@
       home: /
       append: yes
     loop:
-      - { name: prometheus,    group: ['prometheus',    'users'] }
-      - { name: node_exporter, group: ['node_exporter', 'users'] }
-      - { name: alertmanager,  group: ['alertmanager',  'users'] }
+      - { name: prometheus,    group: "prometheus, users" }
+      - { name: node_exporter, group: "node_exporter, users" }
+      - { name: alertmanager,  group: "alertmanager, users" }
 
 # ========================= PROMETHEUS =========================  
 
@@ -47,28 +47,20 @@
 # CREATE DIRECTORIES FOR ALL PACKAGES
   - name: Create directories
     file:
-      path: "{{ item.path }}"
+      path: "{{ item }}"
       state: directory
-      owner: "{{ item.owner }}"
-      group: "{{ item.group }}"
+      owner: 'vagrant'
+      group: 'vagrant'
       mode: 0777
     loop:
-      - { 
-          owner: 'vagrant', 
-          group: 'vagrant',
-          path: [ 
-                  '/etc/prometheus', '/var/lib/prometheus', '/home/vagrant/prometheus', '/home/vagrant/node_exporter',
-                  '/home/vagrant/alertmanager', '/var/lib/alertmanager', '/etc/alertmanager', '/home/vagrant/grafana' 
-                ]   
-        }
-      # - /etc/prometheus
-      # - /var/lib/prometheus
-      # - /home/vagrant/prometheus
-      # - /home/vagrant/node_exporter
-      # - /home/vagrant/alertmanager
-      # - /var/lib/alertmanager
-      # - /etc/alertmanager
-      # - /home/vagrant/grafana
+      - /etc/prometheus
+      - /var/lib/prometheus
+      - /home/vagrant/prometheus
+      - /home/vagrant/node_exporter
+      - /home/vagrant/alertmanager
+      - /var/lib/alertmanager
+      - /etc/alertmanager
+      - /home/vagrant/grafana
 
   - name: Download files for prometheus
     get_url:
@@ -437,8 +429,4 @@
       enabled: yes
 
   when: ansible_hostname != 'admin'
-
-
-
-
-
+  
