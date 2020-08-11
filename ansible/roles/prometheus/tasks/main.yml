@@ -304,21 +304,23 @@
 
 - block: 
 
-  - name: Create group for prometheus
+  - name: Create group for node_exporter
     group:
-      name: prometheus
+      name: "{{ item.name }}"
       state: present
+    loop:
+      - { name: node_exporter }
 
-  - name: Create user for prometheus
+  - name: Create user for node_exporter
     user:
-      name: prometheus
+      name: "{{ item.name }}"
       create_home: no
       shell: /bin/false
-      groups: 
-        - users
-        - prometheus
+      groups: "{{ item.group }}"
       home: /
       append: yes
+    loop:
+      - { name: node_exporter, group: [ 'node_exporter', 'users' ] }
 
   - name: Create directory for node_exporter
     file:
