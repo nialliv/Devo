@@ -1,2 +1,382 @@
 ---
-# tasks file for prometheus
+
+# ========================================
+# ================ ADMIN =================
+# ========================================
+
+- block: 
+
+  - name: Create groups
+    group:
+      name: "{{ item.name }}"
+      state: present
+    loop:
+      - { name: prometheus }
+      - { name: node_exporter } 
+      - { name: alertmanager }
+
+  - name: Create users
+    user:
+      name: "{{ item.name }}"
+      create_home: no
+      shell: /bin/false
+      groups: "{{ item.group }}"
+      home: /
+      append: yes
+    loop:
+      - { name: prometheus,    group: ['prometheus',    'users'] }
+      - { name: node_exporter, group: ['node_exporter', 'users'] }
+      - { name: alertmanager,  group: ['alertmanager',  'users'] }
+
+# ========================= PROMETHEUS =========================  
+
+  - name: Copying prometheus.service to amdin node
+    copy:
+      src: "{{ item }}"   
+      dest: '/etc/systemd/system/'
+      owner: prometheus
+      group: prometheus
+      mode: 0777
+    loop:
+      - 'prometheus.service' 
+      - 'alertmanager.service' 
+      - 'node_exporter.service' 
+
+  - name: Create directory for prometheus
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: 0777
+    loop:
+      - /etc/prometheus
+      - /var/lib/prometheus
+      - /home/vagrant/prometheus
+
+  - name: Download files for prometheus
+    get_url:
+      url: 'https://github.com/prometheus/prometheus/releases/download/v2.20.1/prometheus-2.20.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64.tar.gz'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Unarchive prometheus
+    unarchive:
+      src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/prometheus/'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+      remote_src: yes
+
+  - name: Copying files for prometheus
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/prometheus', dest: '/usr/local/bin/' }
+      - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/promtool', dest: '/usr/local/bin/' }
+      - { src: '/home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/prometheus.yml', dest: '/etc/prometheus' }
+    
+# ========================== NODE_EXPORTER =====================
+  - name: Create directory for node_exporter
+    file:
+      path: /home/vagrant/node_exporter
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Download files for node_exporter
+    get_url:
+      url: 'https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64.tar.gz'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Unarchive node_exporter
+    unarchive:
+      src: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/node_exporter/'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+      remote_src: yes
+
+  - name: Copying files for node_exporter
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - { src: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64/node_exporter', dest: '/usr/local/bin' }
+
+# ========================== ALERT_MANAGER =====================
+
+  - name: Create directory for alertmanager
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - /home/vagrant/alertmanager
+      - /var/lib/alertmanager
+      - /etc/alertmanager
+
+  - name: Download files for alertmanager
+    get_url:
+      url: 'https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz'
+      dest: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64.tar.gz'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Unarchive alertmanager
+    unarchive:
+      src: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64.tar.gz'
+      dest: '/home/vagrant/alertmanager/'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+      remote_src: yes
+
+  - name: Copying files for alertmanager
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - { src: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64/alertmanager', dest: '/usr/local/bin' }
+      - { src: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64/alertmanager.yml', dest: '/etc/alertmanager' }
+
+# ========================== GRAFANA =====================
+
+  - name: Create directory for grafana
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - /home/vagrant/grafana
+
+  - name: Download files for grafana
+    get_url:
+      url: 'https://dl.grafana.com/oss/release/grafana-7.1.3-1.x86_64.rpm'
+      dest: '/home/vagrant/grafana/grafana-7.1.3-1.x86_64.rpm'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Install grafana
+    yum:
+      name: /home/vagrant/grafana/grafana-7.1.3-1.x86_64.rpm
+      state: present
+    register: grafana
+
+  - name: logs for install grafana
+    debug:
+      var: grafana
+
+  - name: Configurate config.yml for prometheus
+    lineinfile:
+      path: /etc/prometheus/prometheus.yml
+      regexp: '-\W[a-z]*:\W[[]\W[a-z]*:[0-9]*\W[]]'
+      line: "      - targets: ['localhost:9100', '192.168.1.11:9100', '192.168.1.12:9100', '192.168.1.13:9100', '192.168.1.14:9100', '192.168.1.15:9100']"
+
+  - name: Configurate config.yml for prometheus1
+    lineinfile:
+      path: /etc/prometheus/prometheus.yml
+      regexp: '- job_name: \Wprometheus\W'
+      line: "  - job_name: 'node'"
+
+  - name: Configurate config.yml for prometheus2
+    lineinfile:
+      path: /etc/prometheus/prometheus.yml
+      regexp: '# - alertmanager:9093'
+      line: "        - alertmanager:9093"
+
+  - name: daemon-reload
+    systemd:
+      daemon_reload: yes
+
+  - name: start services
+    systemd:
+      name: "{{ item.name }}"
+      state: "{{ item.state }}"
+      enabled: yes
+    loop:
+      - { name: node_exporter.service,  state: started }
+      - { name: prometheus.service,     state: started }
+      - { name: alertmanager.service,   state: started }
+      - { name: grafana-server.service, state: started }
+
+
+# - name: Unarchive grafana
+#   unarchive:
+#     src: '/home/vagrant/grafana/alertmanager-0.21.0.linux-amd64.tar.gz'
+#     dest: '/home/vagrant/grafana/'
+#     owner: vagrant
+#     group: vagrant
+#     mode: 0775
+#     remote_src: yes
+
+  # - name: Copying files for grafana
+  #   copy:
+  #     src: "{{ item.src }}"
+  #     dest: "{{ item.dest }}"
+  #     remote_src: yes
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+  #   loop:
+  #     - { src: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64/alertmanager', dest: '/usr/local/bin' }
+  #     - { src: '/home/vagrant/alertmanager/alertmanager-0.21.0.linux-amd64/alertmanager.yml', dest: '/etc/alertmanager' }
+
+
+
+  # - name: Copying files for prometheus3
+  #   copy:
+  #     src: /home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/prometheus.yml
+  #     dest: /etc/prometheus
+  #     remote_src: yes
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+
+  # - name: Copying alertmanager.service to amdin node
+  #   copy:
+  #     src: 'alertmanager.service'  
+  #     dest: '/etc/systemd/system/'
+  #     owner: prometheus
+  #     group: prometheus
+  #     mode: 0644
+
+  # - name: Copying node_exporter.service to amdin node
+  #   copy:
+  #     src: 'node_exporter.service'  
+  #     dest: '/etc/systemd/system/'
+  #     owner: prometheus
+  #     group: prometheus
+  #     mode: 0644
+
+  # - name: Copying files for prometheus2
+  #   copy:
+  #     src: /home/vagrant/prometheus/prometheus-2.20.1.linux-amd64/promtool
+  #     dest: /usr/local/bin/
+  #     remote_src: yes
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+  
+  # - name: Make Directory for prometheus /etc /var
+  #   file:
+  #     path: 
+  #       - /etc/prometheus
+  #       - /var/lib/prometheus
+  #     state: directory
+  #     owner: vagrant
+  #     group: vagrant
+  #     mode: 0775
+
+
+  when: ansible_hostname == 'admin'
+
+# ========================================
+# =============== SERVERS ================
+# ========================================
+
+- block: 
+
+  - name: Create group for prometheus
+    group:
+      name: prometheus
+      state: present
+
+  - name: Create user for prometheus
+    user:
+      name: prometheus
+      create_home: no
+      shell: /bin/false
+      groups: 
+        - users
+        - prometheus
+      home: /
+      append: yes
+
+  - name: Create directory for node_exporter
+    file:
+      path: /home/vagrant/node_exporter
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Download files for node_exporter
+    get_url:
+      url: 'https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64.tar.gz'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+
+  - name: Unarchive node_exporter
+    unarchive:
+      src: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64.tar.gz'
+      dest: '/home/vagrant/node_exporter/'
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+      remote_src: yes
+
+  - name: Copying files for node_exporter
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: 0775
+    loop:
+      - { src: '/home/vagrant/node_exporter/node_exporter-1.0.1.linux-amd64/node_exporter', dest: '/usr/local/bin' }
+
+  - name: Copying node_exporter.service to server node
+    copy:
+      src: 'node_exporter.service'  
+      dest: '/etc/systemd/system/'
+      owner: prometheus
+      group: prometheus
+      mode: 0777
+
+  - name: daemon-reload
+    systemd:
+      daemon_reload: yes
+
+  - name: start services
+    systemd:
+      name: node_exporter.service
+      state: started
+      enabled: yes
+
+  when: ansible_hostname != 'admin'
+
+
+
+
+
