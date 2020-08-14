@@ -1,3 +1,0 @@
----
-# defaults file for generate_idrsa
-host_key_checking: false

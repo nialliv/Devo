@@ -1,8 +1,0 @@
----
-# vars file for generate_idrsa
-# ===== admins ============================
-# adm: 192.168.1.45 # ================
-# ansible_ssh_user: vagrant
-# ansible_ssh_pass: vagrant
-# ansible_become_pass: vagrant
-user_pass_set: vagrant
