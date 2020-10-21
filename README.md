@@ -1,2 +1,2 @@
-# DevoPsi
+# Devo
 +
